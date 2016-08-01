@@ -5,40 +5,56 @@ import os
 from os import path, listdir
 import requests, json
 
-class TrainingRecorder(object):
-    def __init__(self, loss_set, output_dir, saver, ext=None, axis='iteration'):
-        self.start_time = time.time()
-        self.last_time = self.start_time
 
+class TrainingRecorder(object):
+    def __init__(self, label, loss_set, saver, ext=None, axis='iteration'):
+
+        self.label = label
         self.loss_set = loss_set
         self.loss_label = list(list(zip(*loss_set))[0])
         self.loss_label.insert(0, 'total')  # add total loss
-        self.losses = dict([(n, []) for n in self.loss_label])
 
-        self.outputs = []
+        self._load_record()
 
-        self.output_dir = output_dir
-        if not path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+        if not path.exists(self.label):
+            os.makedirs(self.label)
+
         self.ext = ext
         self.saver = saver
-
         self.axis = axis
 
-    def get_head(self):
+        # Timing
+        self.start_time = time.time()
+        self.last_time = self.start_time
+
+    def _load_record(self):
         """
-        Get the index which we should start from
+        This function will try to load record file.
+        Create new record if record file not found.
         :return:
         """
-        # idx = -1
-        with open('result.json', 'r') as f:
-            myjson = json.load(f)
-            if len(myjson['output']) == 0:
-                return 1
-            self.outputs = myjson['output']
-            self.losses = myjson['loss']
-            it = myjson['output'][-1]
-            return it[0]+1
+        jsonfile = self.label + '.json'
+        if os.path.exists(jsonfile):
+            try:
+                with open(jsonfile) as f:
+                    record = json.load(f)
+                    self.outputs = record['output']
+                    self.losses = record['loss']
+            except:
+                raise Exception("Error opening record" + jsonfile)
+
+        else:
+            self.outputs = []
+            self.losses = dict([(n, []) for n in self.loss_label])
+
+    def get_tail(self):
+        """
+        Get the index which we should continue
+        :return:
+        """
+        assert isinstance(self.losses, dict)
+        it = list(self.losses.values())[0]
+        return it[-1][0] + 1 if len(it) > 0 else 0
 
     def reset(self):
         """
@@ -79,14 +95,13 @@ class TrainingRecorder(object):
         }
         requests.post('http://localhost:8000/record', None, myjson)
 
-
     def get_name(self, idx):
         """
         Get the path to file according to the index
         :param idx: current index
         :return: Path to file
         """
-        return path.join(self.output_dir, str(idx)) + (self.ext if self.ext else '')
+        return path.join(self.label, str(idx)) + (self.ext if self.ext else '')
 
     def export(self):
         """
