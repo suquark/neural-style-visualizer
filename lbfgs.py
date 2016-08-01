@@ -1,0 +1,1 @@
+# local x, losses = optim.lbfgs(feval, img, {})

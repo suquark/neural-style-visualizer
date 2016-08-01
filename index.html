@@ -1,0 +1,44 @@
+<html>
+
+<head>
+    <!-- <script src="https://code.highcharts.com/highcharts.js"></script> -->
+
+    <!--<script src="https://cdn.bootcss.com/jquery/2.2.0/jquery.min.js"></script>-->
+    <!--<script src="https://code.highcharts.com/stock/highstock.js"></script>-->
+    <!--<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>-->
+    <!--<script src="https://code.highcharts.com/stock/themes/dark-unica.js"></script>-->
+
+    <!--&lt;!&ndash; Additional files for the Highslide popup effect &ndash;&gt;-->
+    <!--<script src="https://www.highcharts.com/samples/static/highslide-full.min.js"></script>-->
+    <!--<script src="https://www.highcharts.com/samples/static/highslide.config.js" charset="utf-8"></script>-->
+    <!--<link rel="stylesheet" type="text/css" href="https://www.highcharts.com/samples/static/highslide.css"/>-->
+
+    <script src="/static/jquery.min.js"></script>
+    <script src="/static/stock/highstock.js"></script>
+    <script src="/static/stock/modules/exporting.js"></script>
+    <script src="/static/stock/themes/dark-unica-nofont.js"></script>
+
+    <!-- Additional files for the Highslide popup effect -->
+    <script src="/static/highslide/highslide-full.min.js"></script>
+    <script src="/static/highslide.config.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="/static/highslide/highslide.css"/>
+    <script src="/static/board.js" charset="utf-8"></script>
+</head>
+
+<script>
+    loadjson('/result512x512+very-high-learning-rate.json');
+</script>
+
+<div id="container" style="height: 90%; width: 100%; min-width: 310px"></div>
+
+<div style="height: 10%;">
+    <button onclick="toDefault()" style="height: 50%; margin: 5px;"> Default View </button>
+    <button onclick="toValue()" style="height: 50%; margin: 5px;"> Value compare view </button>
+    <button onclick="toPercent()" style="height: 50%; margin: 5px;"> Percent compare view </button>
+    <button onclick="toLogarithmic()" style="height: 50%; margin: 5px;"> Logarithmic View </button>
+
+</div>
+
+<br>
+
+</html>
