@@ -2,6 +2,9 @@
 ### Example user template template
 ### Example user template
 
+result*
+*.lua
+
 # IntelliJ project files
 .idea
 *.iml

@@ -11,7 +11,7 @@ Visualization is important and fun. It tells us what's going on.
 
 For example, you may find an bad output
 
-![](1000.png)
+![](snapshots/1000.png)
 
 after comparing the loss, you will found negative correlation between style loss and content loss(against the assumption of neural-style):
 
@@ -21,8 +21,8 @@ so a very small picture may not be very suitable for neural-style task.
 
 Here's a better result with nearly independent loss:
 
-![](snapshots/200x200/340.png)
-![](snapshots/200x200/992.png)
+![](snapshots/340.png)
+![](snapshots/992.png)
 
 A very high learning rate:
 
