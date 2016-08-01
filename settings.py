@@ -9,8 +9,8 @@ assert img_height == img_width, 'Due to the use of the Gram matrix, width and he
 result_dir = "result"
 
 # The path of content & style image
-content_path = 'content.png'
-style_path = 'style.png'
+content_path = 'inputs/content.png'
+style_path = 'inputs/style.png'
 
 
 learning_rate = 1.0

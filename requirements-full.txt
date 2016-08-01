@@ -2,4 +2,6 @@ Keras==1.0.6
 Pillow==3.0.0
 requests==2.10.0
 h5py==2.5.0
+Theano==0.7.0
 tornado==4.4
+tensorflow==0.9.0
