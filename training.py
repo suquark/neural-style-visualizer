@@ -39,6 +39,8 @@ class Model(object):
         self.model = None
         # evaluate features of content and style images
         print("Pre-evaluate features...")
+        # global msg
+        # msg = "Pre-evaluate features..."
         self.gen_model(K.placeholder(input_shape))
         self.f_output = K.function([self.input_tensor], list(self.outputs_dict.values()))
         self.writedown_content_feature(content)
@@ -46,7 +48,20 @@ class Model(object):
 
         # training model
         self.gen_model(K.variable(x))
+        self.optimizer = Nadam(lr=learning_rate)
         self.compile()
+
+    def set_lr(self, learning_rate):
+        """
+        set the learning rate of the optimizer
+        :param learning_rate: lerning rate pass to the optimizer
+        :return:
+        """
+        # self.optimizer.lr.set_value(learning_rate)
+        K.set_value(self.optimizer.lr, learning_rate)
+        print('learning rate = {}'.format(learning_rate))
+        # global msg
+        # msg = 'learning rate = {}'.format(learning_rate)
 
     def gen_model(self, x):
         """
@@ -129,15 +144,16 @@ class Model(object):
         Defines the way to calculate loss and do optimization
         :return: None
         """
-        optimizer = Nadam(lr=learning_rate)
+        # global msg
         print("Generate loss and grad...")
+        # msg = "Generate loss and grad..."
         losses = [l * w for l, w in zip(*self.get_loss())]
         total_loss = sum(losses)
 
         metrics = [total_loss] + losses
         constraints = []
         # constraints = [lambda x: K.clip(x, 0., 255.)]
-        training_updates = optimizer.get_updates([self.inputs_dict['input']], constraints, total_loss)
+        training_updates = self.optimizer.get_updates([self.inputs_dict['input']], constraints, total_loss)
         # returns loss and metrics. Updates weights at each call.
         self.train_function = K.function([], metrics, updates=training_updates)
 

@@ -3,7 +3,7 @@ import time
 import re
 import os
 from os import path, listdir
-
+import requests, json
 
 class TrainingRecorder(object):
     def __init__(self, loss_set, output_dir, saver, ext=None, axis='iteration'):
@@ -30,12 +30,15 @@ class TrainingRecorder(object):
         Get the index which we should start from
         :return:
         """
-        idx = -1
-        for i in listdir(self.output_dir):
-            m = re.match(r'(?P<idx>\d+)' + self.ext, i)
-            if m:
-                idx = max(idx, int(m.groupdict()['idx']))
-        return idx + 1
+        # idx = -1
+        with open('result.json', 'r') as f:
+            myjson = json.load(f)
+            if len(myjson['output']) == 0:
+                return 1
+            self.outputs = myjson['output']
+            self.losses = myjson['loss']
+            it = myjson['output'][-1]
+            return it[0]+1
 
     def reset(self):
         """
@@ -68,6 +71,14 @@ class TrainingRecorder(object):
         self.saver(output, output_path)
         self.outputs.append([axis, output_path])
         print("results saved at %s \n" % output_path)
+        myjson = {
+            'losses': [float(loss) for loss in losses],
+            'loss_label': self.loss_label,
+            'output': [axis, output_path],
+            'iter': iteration
+        }
+        requests.post('http://localhost:8000/record', None, myjson)
+
 
     def get_name(self, idx):
         """
@@ -89,5 +100,5 @@ class TrainingRecorder(object):
         Export recording to file `$output_dir.json`
         :return:
         """
-        with open(self.output_dir + '.json', 'w') as f:
+        with open('result.json', 'w') as f:
             return json.dump({'loss': self.losses, 'output': self.outputs}, f)

@@ -10,3 +10,4 @@ hs.marginTop = 20;
 hs.marginRight = 20;
 hs.marginBottom = 20;
 hs.marginLeft = 20;
+//hs.allowMultipleInstances = false;
