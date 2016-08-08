@@ -7,7 +7,35 @@ but with a mostly different design.
 
 Visualization is important and fun. It tells us what's going on.
 
-## loss analysis
+## Requirements
+
+- python 3
+- keras
+- tensorflow >= 0.9.0 / Theano
+- h5py
+- Pillow
+- requests
+- tornado 
+
+
+ 
+## Useage
+
+make sure you have the requirements above, or type this in your command line:
+
+	sudo pip install -r requirements.txt
+
+if you want to use tensorflow as backend, follow the [instruction](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/g3doc/get_started/os_setup.md) to install tensorflow first
+
+then 
+
+	python neural_style.py
+
+now you can see the neural style board in `localhost:8000`
+
+![](snapshots/neural_style_board.png)
+
+## Loss analysis
 
 For example, you may find an bad output
 
@@ -28,16 +56,22 @@ A very high learning rate:
 
 ![](snapshots/very-high-lr.png)
 
-## realtime watch 
+## Realtime watch 
 
 ![](snapshots/default.png)
 
-## headstart
+## Headstart
 
 You can stop your training at any time and continue at the last epoch.
 
-## realtime hyperparameter adjusting
+## Realtime hyperparameter adjusting
 
 You are free to adjust hyperparameter
 
+## Speed
 
+Using TensorFlow as backend.
+
+CPU: about 30 seconds/iter on Macbook Pro
+
+GPU: about 0.3 s/iter on an K20
