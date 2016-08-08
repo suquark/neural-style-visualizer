@@ -14,21 +14,18 @@ import requests, time
 
 # load content and style image
 def start_training():
-
     content, style = img_in(content_path, style_path)
 
-    tr = TrainingRecorder(loss_set, result_dir, img_save, '.png')
+    tr = TrainingRecorder(result_dir, loss_set, img_save, '.png')
 
-    idx = tr.get_head() - 1
+    idx = tr.get_tail() - 1
     if idx >= 0:
         x = preprocess_image(tr.get_name(idx))
     else:
         x = grey_image()
-
     idx += 1
 
     model = Model(content, style, x)
-
 
     lst_lr = 1.0
     try:

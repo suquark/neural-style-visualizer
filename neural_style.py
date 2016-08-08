@@ -1,19 +1,23 @@
 from __future__ import print_function
 import os
+import sys
+
+import multiprocessing
+from start_training import start_training
+
+import json
+import uuid
 from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, Application
 from tornado.escape import json_decode
-import json
-from main import start_training
-import multiprocessing
 from tornado.concurrent import Future
 from tornado import gen
-import uuid
 
-
-__author__ = 'xymeow'
+__author__ = 'xymeow', 'suquark'
 
 # TODO: show training messages on the front end
+
+label = None
 
 start = False
 trained = False
@@ -75,7 +79,6 @@ class MainHandler(RequestHandler):
 
 
 class RecordHandler(RequestHandler):
-
     def post(self):
         json_dict = json_decode(self.request.body)
         print(self.request.body)
@@ -109,8 +112,7 @@ class PullRecordHandler(RequestHandler):
 
 class TrainHandler(RequestHandler):
     def get(self):
-        global trained
-        global start
+        global trained, start, label
         if not start:
             start = True
             trained = True
@@ -151,8 +153,12 @@ class PictureHandler(RequestHandler):
 
 class InitJSONHandler(RequestHandler):
     def get(self):
-        with open('result.json', 'rb') as f:
-            self.write(f.read())
+        if os.path.exists(label + '.json'):
+            with open(label + '.json', 'rb') as f:
+                self.write(f.read())
+        else:
+            print('Record file not found.')
+            self.write('{}')
 
 
 class LearningRateHandler(RequestHandler):
@@ -184,5 +190,7 @@ application = Application([
 ], **settings)
 
 if __name__ == "__main__":
+    # assert len(sys.argv) > 1, 'You should give the name of this training'
+    label = sys.argv[1] if len(sys.argv) > 1 else 'result'  # Which record would you like to take?
     application.listen(8000)
     IOLoop.instance().start()
