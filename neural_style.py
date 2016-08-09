@@ -1,30 +1,27 @@
 from __future__ import print_function
 import os
-import sys
-
-import multiprocessing
-from start_training import start_training
-
-import json
-import uuid
 from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, Application
 from tornado.escape import json_decode
+import json
+# from main import start_training
+import multiprocessing
 from tornado.concurrent import Future
 from tornado import gen
+import uuid
+# from training_record import TrainingRecorder
 
-__author__ = 'xymeow', 'suquark'
+__author__ = 'xymeow'
 
 # TODO: show training messages on the front end
-
-label = None
 
 start = False
 trained = False
 stop = False
 lr = 1.0
 
-
+p = None
+record_cache = None
 # use long polling to update the training results
 # I copied these codes from tornado/demo/chat
 class MessageBuffer(object):
@@ -67,7 +64,7 @@ class MessageBuffer(object):
 
 
 record_pool = MessageBuffer()
-
+message_pool = MessageBuffer()
 
 class MainHandler(RequestHandler):
     def get(self):
@@ -79,10 +76,13 @@ class MainHandler(RequestHandler):
 
 
 class RecordHandler(RequestHandler):
+
     def post(self):
+        global record_cache
         json_dict = json_decode(self.request.body)
         print(self.request.body)
-
+        record_cache = json_dict['cache']
+        json_dict.pop('cache')
         myjson = {
             'id': str(uuid.uuid4()),
             'json': json_dict
@@ -112,11 +112,14 @@ class PullRecordHandler(RequestHandler):
 
 class TrainHandler(RequestHandler):
     def get(self):
-        global trained, start, label
+        global trained
+        global start
+        global p
         if not start:
             start = True
             trained = True
-            multiprocessing.Process(target=start_training).start()
+            p = multiprocessing.Process(target=start_training)
+            p.start()
         elif trained:
             trained = False
         elif not trained:
@@ -139,8 +142,11 @@ class StopHandler(RequestHandler):
     def get(self):
         global stop
         global start
+        global p
         stop = True
         start = False
+        if p != None:
+            p.terminate()
 
 
 class PictureHandler(RequestHandler):
@@ -153,12 +159,12 @@ class PictureHandler(RequestHandler):
 
 class InitJSONHandler(RequestHandler):
     def get(self):
-        if os.path.exists(label + '.json'):
-            with open(label + '.json', 'rb') as f:
+        global record_cache
+        if record_cache == None:
+            with open('result.json', 'rb') as f:
                 self.write(f.read())
         else:
-            print('Record file not found.')
-            self.write('{}')
+            self.write(record_cache)
 
 
 class LearningRateHandler(RequestHandler):
@@ -171,6 +177,36 @@ class LearningRateHandler(RequestHandler):
         # print(self.get_argument('lr'))
         lr = float(self.get_argument('lr'))
         print('set learnig rate to {}'.format(lr))
+
+
+class PullMessageHandler(RequestHandler):
+
+    @gen.coroutine
+    def post(self):
+        cursor = self.get_argument("cursor", None)
+        # Save the future returned by wait_for_messages so we can cancel
+        # it in wait_for_messages
+        self.future = message_pool.wait_for_messages(cursor=cursor)
+        messages = yield self.future
+        if self.request.connection.stream.closed():
+            return
+        self.write(dict(messages=messages))
+
+    def on_connection_close(self):
+        message_pool.cancel_wait(self.future)
+
+
+class SetMessageHandler(RequestHandler):
+    def post(self):
+        # global record_cache
+        json_dict = json_decode(self.request.body)
+        print(self.request.body)
+        myjson = {
+            'id': str(uuid.uuid4()),
+            'json': json_dict
+        }
+        message_pool.new_messages([myjson])
+
 
 
 settings = {
@@ -186,11 +222,12 @@ application = Application([
     (r"/picture", PictureHandler),
     (r"/init", InitJSONHandler),
     (r"/lr", LearningRateHandler),
-    (r"/train", TrainHandler)
+    (r"/train", TrainHandler),
+    (r"/setmsg", SetMessageHandler),
+    (r"/getmsg", PullMessageHandler)
 ], **settings)
 
 if __name__ == "__main__":
-    # assert len(sys.argv) > 1, 'You should give the name of this training'
-    label = sys.argv[1] if len(sys.argv) > 1 else 'result'  # Which record would you like to take?
+    print('server start at localhost:8000')
     application.listen(8000)
     IOLoop.instance().start()

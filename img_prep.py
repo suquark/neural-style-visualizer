@@ -28,12 +28,12 @@ def deprocess_image(x):
     return x
 
 
-def random_image():
-    """
-    Create a random image
-    :return: A random image
-    """
-    return np.random.uniform(0, 255, (1, 3, img_width, img_height))
+# def random_image():
+#     """
+#     Create a random image
+#     :return: A random image
+#     """
+#     return np.random.uniform(0, 255, (1, 3, img_width, img_height))
 
 
 def grey_image():

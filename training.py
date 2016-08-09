@@ -4,6 +4,7 @@ import keras.backend as K
 from settings import img_height, img_width, input_shape, learning_rate
 from settings import loss_set, content_feature_layers, style_feature_layers
 from vgg16_cnnonly_model import set_model_input, model_with_input
+import requests
 
 
 def gram_matrix(x):
@@ -39,6 +40,8 @@ class Model(object):
         self.model = None
         # evaluate features of content and style images
         print("Pre-evaluate features...")
+        requests.post('http://localhost:8000/setmsg', None,
+                              {'msg': "Pre-evaluate features..."})
         # global msg
         # msg = "Pre-evaluate features..."
         self.gen_model(K.placeholder(input_shape))
@@ -60,6 +63,8 @@ class Model(object):
         # self.optimizer.lr.set_value(learning_rate)
         K.set_value(self.optimizer.lr, learning_rate)
         print('learning rate = {}'.format(learning_rate))
+        requests.post('http://localhost:8000/setmsg', None,
+                              {'msg': 'set learning rate to {}'.format(learning_rate)})
         # global msg
         # msg = 'learning rate = {}'.format(learning_rate)
 
@@ -146,6 +151,8 @@ class Model(object):
         """
         # global msg
         print("Generate loss and grad...")
+        requests.post('http://localhost:8000/setmsg', None,
+                              {'msg': "Generate loss and grad..."})
         # msg = "Generate loss and grad..."
         losses = [l * w for l, w in zip(*self.get_loss())]
         total_loss = sum(losses)

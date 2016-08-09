@@ -40,14 +40,14 @@
         if (trained){
             console.log('pause');
             $('#train').get(0).innerHTML = 'train';
-            $('#status').get(0).innerHTML = 'pause';
+//            $('#status').get(0).innerHTML = 'pause';
             trained = false;
         }
 
         else {
             console.log('train');
             $('#train').get(0).innerHTML = 'pause';
-            $('#status').get(0).innerHTML = 'training';
+//            $('#status').get(0).innerHTML = 'training';
             trained = true;
         }
     }
@@ -55,7 +55,7 @@
     function stop() {
         $.ajax('/stop')
         $('#train').get(0).innerHTML = 'train';
-        $('#status').get(0).innerHTML = 'stop';
+//        $('#status').get(0).innerHTML = 'stop';
     }
 
     $(document).ready(function() {
@@ -64,6 +64,8 @@
             $.post('http://localhost:8000/lr?lr='+this.value);
     });
         updater.poll();
+//        alert(updater2);
+        updater2.poll();
   });
 
 
@@ -71,7 +73,7 @@
 </script>
 <!--<span id="test" style="padding-left: 240px;"></span>-->
 <ul class="side-nav fixed">
-    <li style="text-align: center"><b >status: <span id="status">stop</span></b></li>
+    <li style="text-align: center"><b >status:</b> <br><span id="status">stop</span></li>
     <li><a class="waves-effect waves-light btn cyan accent-4 white-text" href="javascript: train()" id="train">train</a></li>
     <li><a class="waves-effect waves-light btn cyan accent-4 white-text" href="javascript: stop()" id="stop">stop</a></li>
     <li><a class="waves-effect waves-light btn cyan accent-4 white-text" href="javascript: toDefault()">Default View</a></li>
