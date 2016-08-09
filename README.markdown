@@ -19,7 +19,7 @@ Visualization is important and fun. It tells us what's going on.
 
 
  
-## Useage
+## Usage
 
 make sure you have the requirements above, or type this in your command line:
 
